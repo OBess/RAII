@@ -1,6 +1,6 @@
 # Created by Dima Sushchenko
-# Date: 01.06.2021
-# Last Update: 06.06.2021
+# Creation Date: 01.06.2021
+# Last Update: 16.06.2021
 # Makefile to build a project from .cpp files.
 #
 
@@ -16,7 +16,7 @@ DEBUG_MODE = Debug
 RELEASE_MODE = Release
 
 BUILD_MODE = $(DEBUG_MODE)
-AUTO_RUN = $(TRUE)
+AUTO_RUN = $(FALSE)
 
 # Flags for two build modes
 Release_FLAGS = -O3 -std=c++17 -s -DNDEBUG
@@ -26,6 +26,10 @@ Debug_FLAGS = -O0 -std=c++17 -g -Wall
 # SOURCES - returns list of all .cpp files
 EXECUTABLE = main
 SOURCES = $(shell find ./include -name '*.cpp')
+
+# TEST - filename for testing
+TEST = tests
+TEST_FOLDER_NAME = Test
 
 # Run build
 all: build
@@ -43,12 +47,18 @@ build:
 run:
 	@$(BUILD_MODE)/$(EXECUTABLE)
 
+test:
+	@mkdir -p $(TEST_FOLDER_NAME)
+	$(CXX) $($(DEBUG_MODE)_FLAGS) $(TEST).cpp $(SOURCES) -o $(TEST_FOLDER_NAME)/$(TEST)
+	@$(TEST_FOLDER_NAME)/$(TEST)
+	@echo "makefile: \033[;32mTesting successfully!\033[0m"
+
 # Debugging program
 gdb:
 	@gdb $(DEBUG_MODE)/$(EXECUTABLE)
 
 # Remove folders with executable files
-clean: rm_debug rm_release
+clean: rm_debug rm_release rm_test
 
 rm_debug:
 	@rm -rf $(DEBUG_MODE)
@@ -56,4 +66,7 @@ rm_debug:
 rm_release:
 	@rm -rf $(RELEASE_MODE)
 
-.PHONY: all build run test gdb clean rm_debug rm_release
+rm_test:
+	@rm -rf $(TEST_FOLDER_NAME)
+
+.PHONY: all build run test gdb clean rm_debug rm_release rm_test
